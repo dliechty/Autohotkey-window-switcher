@@ -25,42 +25,32 @@ You set a hotkey and a corresponding utility function responsible to execute the
 *******************************************************************
 */
 
-
 #WinActivateForce ; Prevent task bar buttons from flashing when different windows are activated quickly one after the other.
 
 
 
 ; AppAddress: The address to the .exe (Eg: "C:\Windows\System32\SnippingTool.exe")
 
-OpenOrShowAppBasedOnExeName(AppAddress)
-{
+OpenOrShowAppBasedOnExeName(AppAddress) {
 	AppExeName := SubStr(AppAddress, InStr(AppAddress, "\", false, -1) + 1)
 
-	IfWinExist ahk_exe %AppExeName%
-	{
-		IfWinActive
-		{
+	If WinExist("ahk_exe " . AppExeName) {
+		If WinActive() {
 			WinMinimize
 			Return
-		}
-		else
-		{
+		} else {
 			WinActivate
 			Return
 		}
-	}
-	else
-	{
-		Run, %AppAddress%, UseErrorLevel
-        If ErrorLevel
-        {
-            Msgbox, File %AppAddress% Not Found
+	} else {
+	    try {
+            Run AppAddress
+        } catch {
+            Msgbox("File " . AppAddress . " Not Found")
             Return
-        }
-		else
-		{
-			WinWait, ahk_exe %AppExeName%
-			WinActivate ahk_exe %AppExeName%
+        } else {
+			WinWait("ahk_exe " . AppExeName)
+			WinActivate("ahk_exe " . AppExeName)
 			Return
 		}
 	}
@@ -70,33 +60,24 @@ OpenOrShowAppBasedOnExeName(AppAddress)
 ; WindowTitleWord: Usually the word at the end of the app window title (Eg: in: "New Document - Word" will be "Word")
 ; AppAddress: The address to the .exe (Eg: "C:\Windows\System32\SnippingTool.exe")
 
-OpenOrShowAppBasedOnWindowTitle(WindowTitleWord, AppAddress)
-{
-	SetTitleMatchMode, 2
+OpenOrShowAppBasedOnWindowTitle(WindowTitleWord, AppAddress) {
+	SetTitleMatchMode 2
 
-    IfWinExist, %WindowTitleWord%
-    {
-		IfWinActive
-		{
+    If WinExist(WindowTitleWord) {
+		If WinActive {
 			WinMinimize
 			Return
-		}
-		else
-		{
+		} else {
 			WinActivate
 			Return
 		}
-	}
-    else
-    {
-        Run, %AppAddress%, UseErrorLevel
-        If ErrorLevel
-        {
-            Msgbox, File %AppAddress% Not Found
+	} else {
+        try {
+            Run AppAddress
+        } catch {
+            Msgbox("File " . AppAddress . " Not Found")
             Return
-        }
-		else
-		{
+        } else {
 			WinActivate
 			Return
 		}
@@ -108,28 +89,21 @@ OpenOrShowAppBasedOnWindowTitle(WindowTitleWord, AppAddress)
 ; AppTitle: Usually the word at the end of the app window title(Eg: in: "New Document - Word" will be "Word")
 ; AppModelUserID: A comprehensive guide on how to find the AppModelUserID of a windows store app can be found here: https://jcutrer.com/windows/find-aumid
 
-OpenOrShowAppBasedOnAppModelUserID(AppTitle, AppModelUserID)
-{
-	SetTitleMatchMode, 2
+OpenOrShowAppBasedOnAppModelUserID(AppTitle, AppModelUserID) {
+	SetTitleMatchMode 2
 
-    IfWinExist, %AppTitle%
-    {
-		IfWinActive
-		{
+    If WinExist(AppTitle) {
+		IfWinActive {
 			WinMinimize
 			Return
-		}
-		else
-		{
+		} else {
 			WinActivateBottom %AppTitle%
 		}
-	}
-    else
-    {
-        Run, shell:AppsFolder\%AppModelUserID%, UseErrorLevel
-        If ErrorLevel
-        {
-            Msgbox, File %AppModelUserID% Not Found
+	} else {
+	    try {
+            Run "shell:AppsFolder\" . AppModelUserID
+        } catch {
+            Msgbox("File " . AppModelUserID . " Not Found")
             Return
         }
     }
@@ -150,10 +124,10 @@ ExtractAppTitle(FullTitle) {
 
 ; Switch a "Chrome App or Chrome Website Shortcut" open windows based on the same application title
 HandleChromeWindowsWithSameTitle() {
-    WinGetTitle, FullTitle, A
+    FullTitle := WinGetTitle("A")
     AppTitle := ExtractAppTitle(FullTitle)
-    SetTitleMatchMode, 2
-    WinGet, windowsWithSameTitleList, List, %AppTitle%
+    SetTitleMatchMode 2
+    windowsWithSameTitleList := WinGetList(AppTitle)
     WinActivate, % "ahk_id " windowsWithSameTitleList%windowsWithSameTitleList%
 }
 
