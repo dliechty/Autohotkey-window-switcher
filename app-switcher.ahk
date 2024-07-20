@@ -22,6 +22,16 @@
 ^!+#o:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\Obsidian.exe.lnk")
 ^!+#t:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\ms-teams.exe.lnk")
 
+^!+#Space:: {
+  global
+  activeWindowsIdList := getSortedActiveWindowsIdList()
+  if (activeWindowsIdList.Length == 1) {
+    return
+  }
+  activateNextWindow(activeWindowsIdList)
+  return
+}
+
 /* F8 - Open "Gmail as Chrome App"
  Note: if you have your chrome.exe located in the "Program Files (x86)" folder instead of "Program Files" use:
  F8:: OpenOrShowAppBasedOnWindowTitle("Gmail", "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe --app=https://mail.google.com/mail/")

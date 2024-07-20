@@ -62,13 +62,3 @@ getSortedActiveWindowsIdList() {
 
   return sortedActiveWindowsIdList
 }
-
-^!+#Space:: {
-  global
-  activeWindowsIdList := getSortedActiveWindowsIdList()
-  if (activeWindowsIdList.Length == 1) {
-    return
-  }
-  activateNextWindow(activeWindowsIdList)
-  return
-}
