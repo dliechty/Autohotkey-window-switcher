@@ -1,55 +1,84 @@
+; Cycle between windows of the same app like in macOS - Alt+backtick.
+; Original Source: https://gist.github.com/kamui/12c581c09288ac486faeb1095622c873
+; Based on: https://gist.github.com/rbika/014fb3570beaef195db0bd53fa681037
 
-; NOTE: This functionality is already included in "Open-Apps-and-Switch-opened-windows.ahk" script
-; This AutoHotkey script allows switching between open Windows of the current active App or Chrome Website Shortcut
-; For regular Windows Apps it checks the app Process and Class
-; For Chrome Apps and Chrome Website Shortcuts it checks the window's title (Eg: New Document - Word )
-
-
-/* ;
-*****************************
-***** UTILITY FUNCTIONS *****
-*****************************
-*/
-
-; Extracts the application title from the window's full title
-ExtractAppTitle(FullTitle) {
-    return SubStr(FullTitle, InStr(FullTitle, " ", false, -1) + 1)
+SortNumArray(arr) {
+  str := ""
+  for k, v in arr
+    str .= v "`n"
+  str := Sort(RTrim(str, "`n"), "N")
+  return StrSplit(str, "`n")
 }
 
-; Switch a "Chrome App or Chrome Website Shortcut" open windows based on the same application title
-HandleChromeWindowsWithSameTitle() {
-    WinGetTitle, FullTitle, A
-    AppTitle := ExtractAppTitle(FullTitle)
-    SetTitleMatchMode, 2
-    WinGet, windowsWithSameTitleList, List, %AppTitle%
-    WinActivate, % "ahk_id " windowsWithSameTitleList%windowsWithSameTitleList%
+getArrayValueIndex(arr, val) {
+  Loop arr.Length {
+    if (arr[A_Index] == val)
+      return A_Index
+  }
 }
 
-; Switch "App" open windows based on the same process and class
-HandleWindowsWithSameProcessAndClass(activeProcessName) {
-    WinGetClass, activeClass, A
-    SetTitleMatchMode, 2
-    WinGet, windowsListWithSameProcessAndClass, List, ahk_exe %activeProcessName% ahk_class %activeClass%
-    WinActivate, % "ahk_id " windowsListWithSameProcessAndClass%windowsListWithSameProcessAndClass%
+activateNextWindow(activeWindowsIdList) {
+  currentWinId := WinGetID("A")
+  currentIndex := getArrayValueIndex(activeWindowsIdList, currentWinId)
+
+  if (currentIndex == activeWindowsIdList.Length) {
+    nextIndex := 1
+  } else {
+    nextIndex := currentIndex + 1
+  }
+
+  try {
+    WinActivate("ahk_id " activeWindowsIdList[nextIndex])
+  } catch Error {
+    clonedList := activeWindowsIdList.Clone()
+    clonedList.RemoveAt(nextIndex)
+    activateNextWindow(clonedList)
+  }
 }
 
+activatePreviousWindow(activeWindowsIdList) {
+  currentWinId := WinGetID("A")
+  currentIndex := getArrayValueIndex(activeWindowsIdList, currentWinId)
 
-/* ;
-***********************************
-***** SHORTCUTS CONFIGURATION *****
-***********************************
-*/
+  if (currentIndex == 1) {
+    previousIndex := activeWindowsIdList.Length
+  } else {
+    previousIndex := currentIndex - 1
+  }
 
-; Alt + ` - hotkey to activate NEXT Window of same type of the current App or Chrome Website Shortcut
-!`::
-WinGet, activeProcessName, ProcessName, A
-
-if (activeProcessName = "chrome.exe") {
-    HandleChromeWindowsWithSameTitle()
-} else {
-    HandleWindowsWithSameProcessAndClass(activeProcessName)
+  try {
+    WinActivate("ahk_id " activeWindowsIdList[previousIndex])
+  } catch Error {
+    clonedList := activeWindowsIdList.Clone()
+    clonedList.RemoveAt(previousIndex)
+    activatePreviousWindow(clonedList)
+  }
 }
-Return
 
+getSortedActiveWindowsIdList() {
+  activeProcess := WinGetProcessName("A") ; Retrieves the name of the process that owns the active window
+  activeWindowsIdList := WinGetList("ahk_exe " activeProcess,,,)
+  sortedActiveWindowsIdList := SortNumArray(activeWindowsIdList)
 
+  return sortedActiveWindowsIdList
+}
 
+!`:: {
+  global
+  activeWindowsIdList := getSortedActiveWindowsIdList()
+  if (activeWindowsIdList.Length == 1) {
+    return
+  }
+  activateNextWindow(activeWindowsIdList)
+  return
+}
+
++!`:: {
+  global
+  activeWindowsIdList := getSortedActiveWindowsIdList()
+  if (activeWindowsIdList.Length == 1) {
+    return
+  }
+  activatePreviousWindow(activeWindowsIdList)
+  return
+}
