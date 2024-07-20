@@ -14,8 +14,13 @@
 */
 
 
-; F7 - Open "Notepad"
-F7:: OpenOrShowAppBasedOnExeName("C:\Windows\notepad.exe")
+^!+#s:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\WindowsTerminal.exe.lnk")
+^!+#i:: OpenOrShowAppBasedOnExeName("C:\Users\qwert\AppData\Local\Programs\IntelliJ IDEA Ultimate\bin\idea64.exe")
+^!+#e:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\olk.exe.lnk")
+^!+#c:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\olk.exe.lnk")
+^!+#b:: OpenOrShowAppBasedOnExeName("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
+^!+#o:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\Obsidian.exe.lnk")
+^!+#t:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\ms-teams.exe.lnk")
 
 /* F8 - Open "Gmail as Chrome App"
  Note: if you have your chrome.exe located in the "Program Files (x86)" folder instead of "Program Files" use:

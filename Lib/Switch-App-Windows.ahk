@@ -38,7 +38,7 @@ activateNextWindow(activeWindowsIdList) {
 
 activatePreviousWindow(activeWindowsIdList) {
   currentWinId := WinGetID("A")
-  currentIndex := getArrayValueIndex(activeWindowsIdList, currentWinId)
+currentIndex := getArrayValueIndex(activeWindowsIdList, currentWinId)
 
   if (currentIndex == 1) {
     previousIndex := activeWindowsIdList.Length
@@ -60,31 +60,15 @@ getSortedActiveWindowsIdList() {
   activeWindowsIdList := WinGetList("ahk_exe " activeProcess,,,) ; exclude explorer from the matching
   sortedActiveWindowsIdList := SortNumArray(activeWindowsIdList)
 
-  message := ""
-  Loop sortedActiveWindowsIdList.Length
-      message := message . sortedActiveWindowsIdList[A_Index] . ", "
-
-  Msgbox(message)
-
   return sortedActiveWindowsIdList
 }
 
-!`:: {
+^!+#Space:: {
   global
   activeWindowsIdList := getSortedActiveWindowsIdList()
   if (activeWindowsIdList.Length == 1) {
     return
   }
   activateNextWindow(activeWindowsIdList)
-  return
-}
-
-+!`:: {
-  global
-  activeWindowsIdList := getSortedActiveWindowsIdList()
-  if (activeWindowsIdList.Length == 1) {
-    return
-  }
-  activatePreviousWindow(activeWindowsIdList)
   return
 }

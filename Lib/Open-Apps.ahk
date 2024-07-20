@@ -31,20 +31,25 @@ You set a hotkey and a corresponding utility function responsible to execute the
 
 ; AppAddress: The address to the .exe (Eg: "C:\Windows\System32\SnippingTool.exe")
 
-OpenOrShowAppBasedOnExeName(AppAddress) {
-	AppExeName := SubStr(AppAddress, InStr(AppAddress, "\", false, -1) + 1)
+OpenOrShowAppBasedOnExeName(AppAddress, Options := "") {
+    ; if we used a shortcut with the exe name (to handle weird windows apps
+    ; hidden in some obscure folder that changes based on updates)
+    ; then point to the shortcut and strip out the .lnk at the end to
+    ; get the exe name
+    RemoveLink := AppAddress
+    LinkIndex := InStr(AppAddress, ".lnk",,,-1)
+    if LinkIndex > 0 {
+        RemoveLink := SubStr(AppAddress, 1, LinkIndex - 1)
+    }
+
+	AppExeName := SubStr(RemoveLink, InStr(AppAddress, "\", false, -1) + 1)
 
 	If WinExist("ahk_exe " . AppExeName) {
-		If WinActive() {
-			WinMinimize
-			Return
-		} else {
-			WinActivate
-			Return
-		}
+        WinActivate
+        Return
 	} else {
 	    try {
-            Run AppAddress
+            Run AppAddress . " " . Options
         } catch {
             Msgbox("File " . AppAddress . " Not Found")
             Return
