@@ -57,8 +57,14 @@ activatePreviousWindow(activeWindowsIdList) {
 
 getSortedActiveWindowsIdList() {
   activeProcess := WinGetProcessName("A") ; Retrieves the name of the process that owns the active window
-  activeWindowsIdList := WinGetList("ahk_exe " activeProcess,,,)
+  activeWindowsIdList := WinGetList("ahk_exe " activeProcess,,,) ; exclude explorer from the matching
   sortedActiveWindowsIdList := SortNumArray(activeWindowsIdList)
+
+  message := ""
+  Loop sortedActiveWindowsIdList.Length
+      message := message . sortedActiveWindowsIdList[A_Index] . ", "
+
+  Msgbox(message)
 
   return sortedActiveWindowsIdList
 }

@@ -93,7 +93,7 @@ OpenOrShowAppBasedOnAppModelUserID(AppTitle, AppModelUserID) {
 	SetTitleMatchMode 2
 
     If WinExist(AppTitle) {
-		IfWinActive {
+		If WinActive {
 			WinMinimize
 			Return
 		} else {
@@ -108,66 +108,3 @@ OpenOrShowAppBasedOnAppModelUserID(AppTitle, AppModelUserID) {
         }
     }
 }
-
-
-
-/* ;
-***************************************************
-***** Switch open window  - UTILITY FUNCTIONS *****
-***************************************************
-*/
-
-; Extracts the application title from the window's full title
-ExtractAppTitle(FullTitle) {
-    return SubStr(FullTitle, InStr(FullTitle, " ", false, -1) + 1)
-}
-
-; Switch a "Chrome App or Chrome Website Shortcut" open windows based on the same application title
-HandleChromeWindowsWithSameTitle() {
-    FullTitle := WinGetTitle("A")
-    AppTitle := ExtractAppTitle(FullTitle)
-    SetTitleMatchMode 2
-    windowsWithSameTitleList := WinGetList(AppTitle)
-    WinActivate, % "ahk_id " windowsWithSameTitleList%windowsWithSameTitleList%
-}
-
-; Switch "App" open windows based on the same process and class
-HandleWindowsWithSameProcessAndClass(activeProcessName) {
-    WinGetClass, activeClass, A
-    SetTitleMatchMode, 2
-    WinGet, windowsListWithSameProcessAndClass, List, ahk_exe %activeProcessName% ahk_class %activeClass%
-    WinActivate, % "ahk_id " windowsListWithSameProcessAndClass%windowsListWithSameProcessAndClass%
-}
-
-
-/* ;
-********************************************
-***** YOUR SHORTCUTS CONFIGURATION *****
-********************************************
-*/
-
-
-; F7 - Open "Notepad"
-F7:: OpenOrShowAppBasedOnExeName("C:\Windows\notepad.exe")
-
-/* F8 - Open "Gmail as Chrome App"
- Note: if you have your chrome.exe located in the "Program Files (x86)" folder instead of "Program Files" use:
- F8:: OpenOrShowAppBasedOnWindowTitle("Gmail", "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe --app=https://mail.google.com/mail/")
-*/
-F8:: OpenOrShowAppBasedOnWindowTitle("Gmail", "C:\Program Files\Google\Chrome\Application\chrome.exe --app=https://mail.google.com/mail/")
-
-; F9 - Open "Windows store Calculator app"
-; Note: to get a Windows store app aumid check "https://jcutrer.com/windows/find-aumid"
-F9:: OpenOrShowAppBasedOnAppModelUserID("Calculator", "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App")
-
-
-; Alt + ` - hotkey to activate NEXT Window of same type of the current App or Chrome Website Shortcut
-!`::
-WinGet, activeProcessName, ProcessName, A
-
-if (activeProcessName = "chrome.exe") {
-    HandleChromeWindowsWithSameTitle()
-} else {
-    HandleWindowsWithSameProcessAndClass(activeProcessName)
-}
-Return
