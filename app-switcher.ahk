@@ -21,6 +21,7 @@
 ^!+#b:: OpenOrShowAppBasedOnExeName("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
 ^!+#o:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\Obsidian.exe.lnk")
 ^!+#t:: OpenOrShowAppBasedOnExeName("C:\nextgate\shortcuts\ms-teams.exe.lnk")
+^!+#g:: OpenOrShowAppBasedOnExeName("C:\Users\qwert\AppData\Local\Programs\signal-desktop\Signal.exe")
 
 ^!+#Space:: {
   global
